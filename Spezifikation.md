@@ -62,14 +62,14 @@ struct Game {
 ## Programmablauf
 
 1. Initialisierung
-  1.1 Fenster erstellen
-  1.2 Spielfeld erstellen
+   1. Fenster erstellen
+   2. Spielfeld erstellen
 2. Game-Loop
-  2.1 Noch gültige Verschiebungen?
+   1. Noch gültige Verschiebungen?
     -> Nein => Spiel beenden
-  2.2. Gewonnen && nicht endlos?
+   2. Gewonnen && nicht endlos?
     -> Ja => Spiel beenden
-  2.3. Auf Nutzer-Input warten (nur Pfeiltasten)
-  2.4. Entsprechende Verschiebung ausführen
-  2.5. Falls Verschiebung etwas verändert hat, neue Zahl hinzufügen
+   3. Auf Nutzer-Input warten (nur Pfeiltasten)
+   4. Entsprechende Verschiebung ausführen
+   5. Falls Verschiebung etwas verändert hat, neue Zahl hinzufügen
 3. End-Screen darstellen -> Score, Neues Spiel starten
