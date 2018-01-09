@@ -1,5 +1,12 @@
 #include <stdio.h>
+#include <SDL.h>
 
-int main() {
+typedef struct {
+	SDL_Renderer *renderer;
+} Game;
+
+int WinMain(int argc, char **argv) {
 	printf("Main!");
+
+	return 0;
 }

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -pedantic
+CFLAGS = -std=c99 -Wall -Wextra -pedantic -I./lib/SDL/include -L./lib/SDL/lib/x64 -lSDL2
 
 all: main
 
