@@ -80,7 +80,7 @@
     <NMakeCleanCommandLine>mingw32-make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>mingw32-make rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>"C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include";$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)lib\SDL\include;C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeBuildCommandLine>mingw32-make all</NMakeBuildCommandLine>
@@ -88,7 +88,7 @@
     <NMakeCleanCommandLine>mingw32-make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>mingw32-make rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>"C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include";$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)lib\SDL\include;C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>mingw32-make all</NMakeBuildCommandLine>
@@ -96,7 +96,7 @@
     <NMakeCleanCommandLine>mingw32-make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>mingw32-make rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>"C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include";$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)lib\SDL\include;C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <NMakeBuildCommandLine>mingw32-make all</NMakeBuildCommandLine>
@@ -104,7 +104,7 @@
     <NMakeCleanCommandLine>mingw32-make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>mingw32-make rebuild</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>"C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include";$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)lib\SDL\include;C:\Program Files\Haskell Platform\8.2.1\mingw\x86_64-w64-mingw32\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
