@@ -4,25 +4,31 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdint.h>
 
 #define SIZE 4
 
 void drawBoard(uint8_t board[SIZE][SIZE]) {
-	uint8_t x,y;
-	for (y=0;y<SIZE;y++) {
-		for (x=0;x<SIZE;x++) {
-		printf("\n");
-		for (x=0;x<SIZE;x++) {
-			if (board[x][y]!=0) {
-				char s[8];
-				sprintf(s,8,"%u",(uint32_t)1<<board[x][y]);
-				uint8_t t = 7-strlen(s);
-				printf("%*s%s%*s",t-t/2,"",s,t/2,"");
-			} else {
-				printf("   ·   ");
+	uint8_t x, y;
+	for (y = 0; y < SIZE; y++) {
+		for (x = 0; x < SIZE; x++) {
+			printf("\n");
+			for (x = 0; x < SIZE; x++) {
+				if (board[x][y] != 0) {
+					char s[8];
+					sprintf(s, 8, "%u", (uint32_t)1 << board[x][y]);
+					uint8_t t = 7 - strlen(s);
+					printf("%*s%s%*s", t - t / 2, "", s, t / 2, "");
+				}
+				else {
+					printf("   ·   ");
+				}
+			}
 		}
+	}
+}
 
-uint8_t findTarget(uint8_t array[], int arrSize, uint8_t x,uint8_t stop) {
+uint8_t findTarget(uint8_t array[], uint8_t x,uint8_t stop) {
 	uint8_t t;// if the position is already on the first, don't evaluate
 	if (x==0) {
 		return x;
