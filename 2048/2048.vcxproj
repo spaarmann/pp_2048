@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\common.c" />
     <ClCompile Include="src\game.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\renderer.c" />
@@ -27,6 +28,7 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\common.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\renderer.h" />
   </ItemGroup>
