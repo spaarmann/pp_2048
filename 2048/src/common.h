@@ -1,12 +1,22 @@
 #pragma once
 #include <SDL.h>
 
+typedef struct _tile_texture {
+	uint32_t val;
+	SDL_Texture *texture;
+
+	struct _tile_texture *next;
+} TileTexture;
+
 typedef struct {
 	// Board has size*size elements
 	uint32_t *board;
 	uint8_t size;
 
 	SDL_Renderer *renderer;
+	SDL_Window *window;
+
+	TileTexture *tile_textures;
 	int window_width, window_height;
 } Game;
 

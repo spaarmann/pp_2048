@@ -15,14 +15,15 @@ int main(int argc, char **argv) {
 
 	game.window_width = WIDTH;
 	game.window_height = HEIGHT;
-	game.renderer = create_renderer_and_window(WIDTH, HEIGHT);
+	create_renderer_and_window(&game.window, &game.renderer, WIDTH, HEIGHT);
+	create_initial_tile_textures(&game);
 
 	for (int x = 0; x < game.size; x++) {
 		for (int y = 0; y < game.size; y++) {
 			uint32_t val;
 
-			if (x == y) val = 0;
-			else if (x < 2 && y < 2) val = 2;
+			/*if (x == y) val = 0;
+			else */if (x < 2 && y < 2) val = 2;
 			else if (x < 2) val = 4;
 			else if (y < 2) val = 8;
 			else val = 16;

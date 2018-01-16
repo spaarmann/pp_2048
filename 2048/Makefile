@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -Wextra -pedantic -g -I.\lib\SDL\include
-LDFLAGS = -L.\lib\SDL\lib\x64 -lSDL2main -lSDL2	-lSDL2_ttf
+LDFLAGS = -L.\lib\SDL\lib\x64 -lSDL2main -lSDL2	-lSDL2_ttf -lSDL2_image -lm
 
 
 all: main
