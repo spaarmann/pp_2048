@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 		SDL_RenderPresent(game.renderer);
 	}
 
+	free_rendering_stuff(&game);
 	free(game.board);
 
 	return 0;

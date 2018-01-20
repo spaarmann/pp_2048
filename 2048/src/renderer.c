@@ -7,27 +7,51 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
-void sdl_error(char *msg) {
+void sdl_error(Game *game, char *msg) {
 	printf("SDL Error (%s): %s\n", msg, SDL_GetError());
+
+	free_rendering_stuff(game);
+	IMG_Quit();
+	TTF_Quit();
 	SDL_Quit();
-	// TODO: Resource cleanup
+
+	exit(1);
+}
+
+void img_error(Game *game, char *msg) {
+	printf("IMG Error (%s): %s\n", msg, IMG_GetError());
+
+	free_rendering_stuff(game);
+	IMG_Quit();
+	TTF_Quit();
+	SDL_Quit();
+
+	exit(1);
+}
+
+void ttf_error(Game *game, char *msg) {
+	printf("TTF Error (%s): %s\n", msg, TTF_GetError());
+
+	free_rendering_stuff(game);
+	IMG_Quit();
+	TTF_Quit();
+	SDL_Quit();
+
 	exit(1);
 }
 
 void create_renderer_and_window(Game *game, int width, int height) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		sdl_error("SDL_Init");
+		sdl_error(game, "SDL_Init");
 	}
 
 	if (TTF_Init() != 0) {
-		// TODO: TTF_Error
-		sdl_error("TTF_Init");
+		ttf_error(game, "TTF_Init");
 	}
 
 	int img_flags = IMG_INIT_PNG;
 	if (!(IMG_Init(img_flags) & img_flags)) {
-		// TODO: Img_Error
-		sdl_error("IMG_Init");
+		img_error(game, "IMG_Init");
 	}
 
 	game->window = SDL_CreateWindow("2048",
@@ -35,26 +59,24 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		width, height, 0);
 
 	if (game->window == NULL) {
-		sdl_error("CreateWindow");
+		sdl_error(game, "CreateWindow");
 	}
 
 	game->renderer = SDL_CreateRenderer(game->window,
 		-1, SDL_RENDERER_PRESENTVSYNC);
 
 	if (game->renderer == NULL) {
-		sdl_error("CreateRenderer");
+		sdl_error(game, "CreateRenderer");
 	}
 
 	game->interface_font = TTF_OpenFont("./res/font.ttf", 80);
 	if (game->interface_font == NULL) {
-		// TODO: TTF_Error
-		sdl_error("OpenFont");
+		ttf_error(game, "OpenFont");
 	}
 
 	SDL_Surface *playAgainSurface = IMG_Load("./res/PlayAgainButton.png");
 	if (playAgainSurface == NULL) {
-		// TODO: IMG_Error
-		sdl_error("OpenImage");
+		img_error(game, "OpenImage");
 	}
 
 	game->play_again_texture = SDL_CreateTextureFromSurface(game->renderer, playAgainSurface);
@@ -66,13 +88,12 @@ void create_renderer_and_window(Game *game, int width, int height) {
 void create_initial_tile_textures(Game *game) {
 	SDL_Surface *base_tile_surface = IMG_Load("./res/Tile.png");
 	if (base_tile_surface == NULL) {
-		// TODO: IMG_Error
+		img_error(game, "Load");
 	}
 
 	TTF_Font *font = TTF_OpenFont("./res/font.ttf", 256);
 	if (font == NULL) {
-		// TODO: TTF_Error
-		sdl_error("OpenFont");
+		ttf_error(game, "OpenFont");
 	}
 
 	uint32_t current_step = 0;
@@ -153,6 +174,30 @@ void create_initial_tile_textures(Game *game) {
 
 	SDL_FreeSurface(base_tile_surface);
 	TTF_CloseFont(font);
+}
+
+void free_rendering_stuff(Game *game) {
+	TileTexture *tex, *next;
+	tex = game->tile_textures;
+	while (tex != NULL) {
+		SDL_DestroyTexture(tex->texture);
+		next = tex->next;
+		free(tex);
+		tex = next;
+	}
+
+	if (game->play_again_texture != NULL) {
+		SDL_DestroyTexture(game->play_again_texture);
+		free(game->play_again_rect);
+	}
+
+	if (game->interface_font != NULL)
+		TTF_CloseFont(game->interface_font);
+
+	if (game->renderer != NULL)
+		SDL_DestroyRenderer(game->renderer);
+	if (game->window != NULL)
+		SDL_DestroyWindow(game->window);
 }
 
 void display_square(Game *game, const uint32_t val, const SDL_Rect *rect) {
