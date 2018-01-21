@@ -69,7 +69,7 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		sdl_error(game, "CreateRenderer");
 	}
 
-	game->interface_font = TTF_OpenFont("./res/font.ttf", 80);
+	game->interface_font = TTF_OpenFont("./res/font.ttf", 60);
 	if (game->interface_font == NULL) {
 		ttf_error(game, "OpenFont");
 	}

@@ -2,11 +2,11 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-typedef struct _tile_texture {
+typedef struct TileTexture {
 	uint32_t val;
 	SDL_Texture *texture;
 
-	struct _tile_texture *next;
+	struct TileTexture *next;
 } TileTexture;
 
 enum GameState {
