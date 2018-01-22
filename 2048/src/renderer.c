@@ -7,6 +7,8 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+#include "game.h"
+
 void sdl_error(Game *game, char *msg) {
 	printf("SDL Error (%s): %s\n", msg, SDL_GetError());
 
@@ -339,18 +341,22 @@ void display_endscreen(Game *game) {
 	SDL_RenderCopy(game->renderer, texture, NULL, &dst);
 	SDL_DestroyTexture(texture);
 
-	char *flavourText;
+	char *flavour_text;
 	if (game->mode == Endless) {
-		flavourText = "Game Over";
+		flavour_text = "Game Over";
 	}
 	else {
-		// TODO: Make it possible to win
-		flavourText = "You lost!";
+		if (has_won(game)) {
+			flavour_text = "You won!";
+		}
+		else {
+			flavour_text = "You lost!";
+		}
 	}
 
-	surface = TTF_RenderText_Blended(game->interface_font, flavourText, color);
+	surface = TTF_RenderText_Blended(game->interface_font, flavour_text, color);
 	texture = SDL_CreateTextureFromSurface(game->renderer, surface);
-	TTF_SizeText(game->interface_font, flavourText, &font_width, &font_height);
+	TTF_SizeText(game->interface_font, flavour_text, &font_width, &font_height);
 	SDL_Rect dst2 = { 25, 20, font_width, font_height };
 	
 	SDL_RenderCopy(game->renderer, texture, NULL, &dst2);

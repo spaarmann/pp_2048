@@ -23,7 +23,7 @@ void init_board(Game *game) {
 int main(int argc, char **argv) {
 	Game game;
 
-	game.size = 4; // TODO: Make configurable?
+	game.size = 4;
 	game.board = malloc(sizeof(uint32_t) * game.size * game.size);
 	game.state = StartScreen;
 
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
 						add_new_number(&game);
 					}
 
-					if (!has_valid_moves(&game)) {
+					if (!has_valid_moves(&game) || has_won(&game)) {
 						game.state = EndScreen;
 					}
 				}

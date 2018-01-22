@@ -196,3 +196,13 @@ bool has_valid_moves(Game *game) {
 
 	return any_moves_found;
 }
+
+bool has_won(Game *game) {
+	if (game->mode == Endless) return false;
+
+	for (int i = 0; i < (game->size * game->size); i++) {
+		if (game->board[i] >= 2048) return true;
+	}
+
+	return false;
+}
