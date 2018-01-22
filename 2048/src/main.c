@@ -25,29 +25,13 @@ int main(int argc, char **argv) {
 
 	game.size = 4; // TODO: Make configurable?
 	game.board = malloc(sizeof(uint32_t) * game.size * game.size);
-	game.state = InGame;
+	game.state = StartScreen;
 
 	game.window_width = WIDTH;
 	game.window_height = HEIGHT;
 
 	create_renderer_and_window(&game, WIDTH, HEIGHT);
 	create_initial_tile_textures(&game);
-
-	/*for (int x = 0; x < game.size; x++) {
-		for (int y = 0; y < game.size; y++) {
-			uint32_t val;
-
-			if (x == y) val = 0;
-			else if (x < 2 && y < 2) val = 2;
-			else if (x < 2) val = 4;
-			else if (y < 2) val = 8;
-			else val = 16;
-
-			game.board[y + x * game.size] = val;
-		}
-	}*/
-
-	init_board(&game);
 
 	SDL_Event e;
 	int quit = 0;
@@ -57,6 +41,32 @@ int main(int argc, char **argv) {
 		SDL_RenderClear(game.renderer);
 
 		switch (game.state) {
+		case StartScreen:
+			while (SDL_PollEvent(&e)) {
+				switch (e.type) {
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				case SDL_MOUSEBUTTONUP: {
+					SDL_Point p = { e.button.x, e.button.y };
+					if (SDL_PointInRect(&p, game.start_normal_rect)) {
+						init_board(&game);
+						game.mode = Normal;
+						game.state = InGame;
+					}
+					else if (SDL_PointInRect(&p, game.start_endless_rect)) {
+						init_board(&game);
+						game.mode = Endless;
+						game.state = InGame;
+					}
+					break;
+				}
+				}
+			}
+
+			display_startscreen(&game);
+
+			break;
 		case InGame:
 			while (SDL_PollEvent(&e)) {
 				switch (e.type) {

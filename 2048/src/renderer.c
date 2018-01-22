@@ -41,6 +41,12 @@ void ttf_error(Game *game, char *msg) {
 }
 
 void create_renderer_and_window(Game *game, int width, int height) {
+	game->window = NULL;
+	game->renderer = NULL;
+	game->tile_textures = NULL;
+	game->startscreen_texture = NULL;
+	game->endscreen_texture = NULL;
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		sdl_error(game, "SDL_Init");
 	}
@@ -74,106 +80,155 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		ttf_error(game, "OpenFont");
 	}
 
-	SDL_Surface *playAgainSurface = IMG_Load("./res/PlayAgainButton.png");
-	if (playAgainSurface == NULL) {
+	SDL_Surface *startscreen_surface = IMG_Load("./res/StartScreen.png");
+	if (startscreen_surface == NULL) {
 		img_error(game, "OpenImage");
 	}
 
-	game->play_again_texture = SDL_CreateTextureFromSurface(game->renderer, playAgainSurface);
+	game->startscreen_texture = SDL_CreateTextureFromSurface(game->renderer, startscreen_surface);
+
 	SDL_Rect *rect = malloc(sizeof(SDL_Rect));
-	rect->x = 50; rect->y = 200; rect->w = 500; rect->h = 286;
+	rect->x = 80; rect->y = 130; rect->w = 470; rect->h = 130;
+	game->start_normal_rect = rect;
+
+	rect = malloc(sizeof(SDL_Rect));
+	rect->x = 80; rect->y = 415; rect->w = 470; rect->h = 130;
+	game->start_endless_rect = rect;
+
+	SDL_Surface *endscreen_surface = IMG_Load("./res/EndScreen.png");
+	if (endscreen_surface == NULL) {
+		img_error(game, "OpenImage");
+	}
+
+	game->endscreen_texture = SDL_CreateTextureFromSurface(game->renderer, endscreen_surface);
+
+	rect = malloc(sizeof(SDL_Rect));
+	rect->x = 80; rect->y = 290; rect->w = 470; rect->h = 130;
 	game->play_again_rect = rect;
+
 }
 
-void create_initial_tile_textures(Game *game) {
+TileTexture *create_tile_texture(Game *game,
+	TileTexture *last_texture,
+	uint32_t value,
+	SDL_Surface *base_tile_surface,
+	TTF_Font *font,
+	Uint32 color)
+{
+	TileTexture *tile_texture = malloc(sizeof(TileTexture));
+	tile_texture->next = NULL;
+	tile_texture->val = value;
+
+	if (last_texture == NULL) {
+		game->tile_textures = tile_texture;
+	}
+	else {
+		last_texture->next = tile_texture;
+	}
+
+
+	Uint8 srcR, srcG, srcB, srcA;
+	Uint8 resR, resG, resB, resA;
+
+	SDL_PixelFormat *format = base_tile_surface->format;
+	SDL_Surface *surface = SDL_CreateRGBSurface(0, base_tile_surface->w, base_tile_surface->h,
+		format->BitsPerPixel, format->Rmask, format->Gmask, format->Bmask, format->Amask);
+
+	Uint32 *srcPixels = (Uint32 *)base_tile_surface->pixels;
+	Uint32 *resPixels = (Uint32 *)surface->pixels;
+
+	for (int index = 0; index < (base_tile_surface->h * base_tile_surface->w); index++) {
+		SDL_GetRGBA(srcPixels[index], format, &srcR, &srcG, &srcB, &srcA);
+
+		if (srcA == 0xFF) {
+			resR = (color >> 24) & 0x000000FF;
+			resG = (color >> 16) & 0x000000FF;
+			resB = (color >> 8) & 0x000000FF;
+			resA = (color >> 0) & 0x000000FF;
+		}
+		else {
+			resR = resG = resB = resA = 0x00;
+		}
+
+		resPixels[index] = SDL_MapRGBA(format, resR, resG, resB, resA);
+	}
+
+	if (value != 0) {
+		char text[10];
+		sprintf(text, "%d", value);
+
+		SDL_Color textColor = { 255, 255, 255, 255 };
+		SDL_Surface *fontSurface = TTF_RenderText_Blended(font, text, textColor);
+
+		int font_width, font_height;
+		TTF_SizeText(font, text, &font_width, &font_height);
+
+		int tile_size = base_tile_surface->h;
+
+		SDL_Rect dst = { tile_size / 2 - font_width / 2, tile_size / 2 - font_height / 2, font_width, font_height };
+		SDL_BlitSurface(fontSurface, NULL, surface, &dst);
+
+		SDL_FreeSurface(fontSurface);
+	}
+
+	tile_texture->texture = SDL_CreateTextureFromSurface(game->renderer, surface);
+	SDL_FreeSurface(surface);
+
+	return tile_texture;
+}
+
+void create_more_tile_textures(Game *game, TileTexture *last) {
 	SDL_Surface *base_tile_surface = IMG_Load("./res/Tile.png");
 	if (base_tile_surface == NULL) {
 		img_error(game, "Load");
 	}
 
-	TTF_Font *font = TTF_OpenFont("./res/font.ttf", 256);
+	TTF_Font *font = TTF_OpenFont("./res/font.ttf", 200);
 	if (font == NULL) {
 		ttf_error(game, "OpenFont");
 	}
 
 	uint32_t current_step = 0;
-	uint32_t steps_total = 11; // 2 ^ 11 = 2048
 
-	TileTexture *current_texture = NULL;
+	if (last != NULL) {
+		current_step = (uint32_t)(log(last->val) / log(2));
+	}
+
+	uint32_t steps_total = current_step + 11; // 2 ^ 11 = 2048
 
 	SDL_Surface *current_surface;
 
 	while (current_step <= steps_total) {
-		uint32_t current_value = (uint32_t) pow(2, current_step);
-		if (current_texture == NULL) {
-			current_texture = malloc(sizeof(TileTexture));
-			game->tile_textures = current_texture;
+		uint32_t current_value = (uint32_t)pow(2, current_step);
+		if (current_step == 0) current_value = 0;
+
+		Uint8 r;
+		if (current_step <= 11) {
+			r = ((float)current_step / 11) * 0xF0 + 0x0F;
 		}
 		else {
-			current_texture->next = malloc(sizeof(TileTexture));
-			current_texture = current_texture->next;
+			r = 0xFF;
 		}
+		Uint32 color = (r << 24) | 0x000000FF;
 
-		if (current_step == 0) {
-			current_texture->val = 0;
-		}
-		else {
-			current_texture->val = current_value;
-		}
-
-		Uint8 srcR, srcG, srcB, srcA;
-		Uint8 resR, resG, resB, resA;
-
-		SDL_PixelFormat *format = base_tile_surface->format;
-		current_surface = SDL_CreateRGBSurface(0, base_tile_surface->w, base_tile_surface->h,
-			format->BitsPerPixel, format->Rmask, format->Gmask, format->Bmask, format->Amask);
-
-		Uint32 *srcPixels = (Uint32 *)base_tile_surface->pixels;
-		Uint32 *resPixels = (Uint32 *)current_surface->pixels;
-
-		for (int index = 0; index < (base_tile_surface->h * base_tile_surface->w); index++) {
-			SDL_GetRGBA(srcPixels[index], format, &srcR, &srcG, &srcB, &srcA);
-
-			if (srcA == 0xFF) {
-				resR = ((float) current_step / steps_total) * 0xF0 + 0x0F;
-				resG = 0x00;
-				resB = 0x00;
-				resA = 0xFF;
-			}
-			else {
-				resR = resG = resB = 0x00;
-				resA = 0x00;
-			}
-
-			resPixels[index] = SDL_MapRGBA(format, resR, resG, resB, resA);
-		}
-
-		if (current_step != 0) {
-			char text[10];
-			sprintf(text, "%d", current_value);
-
-			SDL_Color textColor = { 255, 255, 255, 255 };
-			SDL_Surface *fontSurface = TTF_RenderText_Blended(font, text, textColor);
-
-			int font_width, font_height;
-			TTF_SizeText(font, text, &font_width, &font_height);
-
-			int tile_size = base_tile_surface->h;
-
-			SDL_Rect dst = { tile_size / 2 - font_width / 2, tile_size / 2 - font_height / 2, font_width, font_height };
-			SDL_BlitSurface(fontSurface, NULL, current_surface, &dst);
-
-  			SDL_FreeSurface(fontSurface);
-		}
-
-		current_texture->texture = SDL_CreateTextureFromSurface(game->renderer, current_surface);
-		SDL_FreeSurface(current_surface);
+		last = create_tile_texture(
+			game,
+			last,
+			current_value,
+			base_tile_surface,
+			font,
+			color
+		);
 
 		current_step++;
 	}
 
 	SDL_FreeSurface(base_tile_surface);
 	TTF_CloseFont(font);
+}
+
+void create_initial_tile_textures(Game *game) {
+	create_more_tile_textures(game, NULL);
 }
 
 void free_rendering_stuff(Game *game) {
@@ -186,8 +241,14 @@ void free_rendering_stuff(Game *game) {
 		tex = next;
 	}
 
-	if (game->play_again_texture != NULL) {
-		SDL_DestroyTexture(game->play_again_texture);
+	if (game->startscreen_texture != NULL) {
+		SDL_DestroyTexture(game->startscreen_texture);
+		free(game->start_normal_rect);
+		free(game->start_endless_rect);
+	}
+
+	if (game->endscreen_texture != NULL) {
+		SDL_DestroyTexture(game->endscreen_texture);
 		free(game->play_again_rect);
 	}
 
@@ -206,6 +267,10 @@ void display_square(Game *game, const uint32_t val, const SDL_Rect *rect) {
 		if (tex->val == val) {
 			break;
 		}
+		if (tex->next == NULL) {
+			create_more_tile_textures(game, tex);
+		}
+
 		tex = tex->next;
 	}
 
@@ -252,10 +317,16 @@ void display_interface(Game *game) {
 	SDL_RenderCopy(game->renderer, texture, NULL, &dst);
 }
 
+void display_startscreen(Game *game) {
+	SDL_RenderCopy(game->renderer, game->startscreen_texture, NULL, NULL);
+}
+
 void display_endscreen(Game *game) {
+	SDL_RenderCopy(game->renderer, game->endscreen_texture, NULL, NULL);
+
 	char scoreText[45];
 	sprintf(scoreText, "Your Score: %d", game->score);
-	
+
 	SDL_Color color = { 255, 255, 255, 255 };
 	SDL_Surface *surface = TTF_RenderText_Blended(game->interface_font, scoreText, color);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(game->renderer, surface);
@@ -263,9 +334,25 @@ void display_endscreen(Game *game) {
 
 	int font_width, font_height;
 	TTF_SizeText(game->interface_font, scoreText, &font_width, &font_height);
-	SDL_Rect dst = { 25, 10, font_width, font_height };
+	SDL_Rect dst = { 25, 80, font_width, font_height };
 
 	SDL_RenderCopy(game->renderer, texture, NULL, &dst);
+	SDL_DestroyTexture(texture);
 
-	SDL_RenderCopy(game->renderer, game->play_again_texture, NULL, game->play_again_rect);
+	char *flavourText;
+	if (game->mode == Endless) {
+		flavourText = "Game Over";
+	}
+	else {
+		// TODO: Make it possible to win
+		flavourText = "You lost!";
+	}
+
+	surface = TTF_RenderText_Blended(game->interface_font, flavourText, color);
+	texture = SDL_CreateTextureFromSurface(game->renderer, surface);
+	TTF_SizeText(game->interface_font, flavourText, &font_width, &font_height);
+	SDL_Rect dst2 = { 25, 20, font_width, font_height };
+	
+	SDL_RenderCopy(game->renderer, texture, NULL, &dst2);
+	SDL_DestroyTexture(texture);
 }

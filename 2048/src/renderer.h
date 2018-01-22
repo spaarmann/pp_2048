@@ -14,6 +14,7 @@ void create_initial_tile_textures(Game *game);
 void display_board(Game *game);
 void display_interface(Game *game);
 
+void display_startscreen(Game *game);
 void display_endscreen(Game *game);
 
 void free_rendering_stuff(Game *game);

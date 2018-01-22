@@ -64,7 +64,7 @@ bool slide_array(Game *game, uint32_t *array) {
 				}
 				else if (array[t] == array[x]) {
 					array[t] *= 2; // merge (increase power of two)
-					game->score += array[t]; 
+					game->score += array[t];
 					stop = t + 1; // set stop to avoid double merge
 				}
 				array[x] = 0;
@@ -158,13 +158,13 @@ uint32_t count_empty(Game *game) {
 
 void add_new_number(Game *game) {
 	int val = rand() % 2 == 0 ? 2 : 4;
-	
+
 	uint32_t empties = count_empty(game);
 	int pos = rand() % empties;
 
 	int idx = 0;
 	int passed_empties = 0;
-	
+
 	while (passed_empties <= pos) {
 		if (game->board[idx] == 0) {
 			passed_empties++;

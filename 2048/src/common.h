@@ -10,8 +10,14 @@ typedef struct TileTexture {
 } TileTexture;
 
 enum GameState {
+	StartScreen,
 	InGame,
 	EndScreen
+};
+
+enum GameMode {
+	Normal,
+	Endless
 };
 
 typedef struct {
@@ -22,6 +28,7 @@ typedef struct {
 	uint32_t score;
 
 	enum GameState state;
+	enum GameMode mode;
 
 	SDL_Renderer *renderer;
 	SDL_Window *window;
@@ -29,8 +36,12 @@ typedef struct {
 
 	TileTexture *tile_textures;
 
+	SDL_Rect *start_normal_rect;
+	SDL_Rect *start_endless_rect;
+	SDL_Texture *startscreen_texture;
+
 	SDL_Rect *play_again_rect;
-	SDL_Texture *play_again_texture;
+	SDL_Texture *endscreen_texture;
 
 	int window_width, window_height;
 } Game;
