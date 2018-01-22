@@ -9,6 +9,7 @@
 const int WIDTH = 600;
 const int HEIGHT = 700;
 
+// Resets the board to a starting state.
 void init_board(Game *game) {
 	game->score = 0;
 
@@ -21,6 +22,7 @@ void init_board(Game *game) {
 }
 
 int main(int argc, char **argv) {
+	// Create our main game struct.
 	Game game;
 
 	game.size = 4;
@@ -30,24 +32,31 @@ int main(int argc, char **argv) {
 	game.window_width = WIDTH;
 	game.window_height = HEIGHT;
 
+	// Create window and initialise some rendering stuff.
 	create_renderer_and_window(&game, WIDTH, HEIGHT);
 	create_initial_tile_textures(&game);
 
 	SDL_Event e;
 	int quit = 0;
 
+	// Main Game Loop
 	while (!quit) {
+		// Clear screen
 		SDL_SetRenderDrawColor(game.renderer, 178, 125, 73, 255);
 		SDL_RenderClear(game.renderer);
 
+		// Execute different code based on the current state of the game.
 		switch (game.state) {
 		case StartScreen:
+			// Handle SDL events.
 			while (SDL_PollEvent(&e)) {
 				switch (e.type) {
 				case SDL_QUIT:
 					quit = 1;
 					break;
 				case SDL_MOUSEBUTTONUP: {
+					// Pressed the mouse, check if it was on the
+					// "Normal" or "Endless" buttons.
 					SDL_Point p = { e.button.x, e.button.y };
 					if (SDL_PointInRect(&p, game.start_normal_rect)) {
 						init_board(&game);
@@ -64,6 +73,7 @@ int main(int argc, char **argv) {
 				}
 			}
 
+			// Render the buttons.
 			display_startscreen(&game);
 
 			break;
@@ -74,6 +84,7 @@ int main(int argc, char **argv) {
 					quit = 1;
 					break;
 				case SDL_KEYDOWN: {
+					// Keyboard input
 					bool moved_anything = false;
 					switch (e.key.keysym.sym) {
 					case SDLK_UP:
@@ -95,20 +106,25 @@ int main(int argc, char **argv) {
 					}
 
 					if (moved_anything) {
+						// Add a new number if a move was executed.
 						add_new_number(&game);
 					}
 
 					if (!has_valid_moves(&game) || has_won(&game)) {
+						// Change to end screen if we lost or won.
 						game.state = EndScreen;
 					}
 				}
 				}
 			}
 
+			// Display the score text.
 			display_interface(&game);
+			// Display the board.
 			display_board(&game);
 			break;
 		case EndScreen:
+			// Like the start screen above.
 			while (SDL_PollEvent(&e)) {
 				switch (e.type) {
 				case SDL_QUIT:
@@ -125,14 +141,17 @@ int main(int argc, char **argv) {
 				}
 			}
 
+			// Display the play again button.
 			display_endscreen(&game);
 
 			break;
 		}
 
+		// Actually show our rendered image on the screen.
 		SDL_RenderPresent(game.renderer);
 	}
 
+	// When we exit, don't forget to clean up our resources.
 	free_rendering_stuff(&game);
 	free(game.board);
 

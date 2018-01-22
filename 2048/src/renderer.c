@@ -9,6 +9,8 @@
 
 #include "game.h"
 
+// Error handling functions.
+
 void sdl_error(Game *game, char *msg) {
 	printf("SDL Error (%s): %s\n", msg, SDL_GetError());
 
@@ -42,6 +44,7 @@ void ttf_error(Game *game, char *msg) {
 	exit(1);
 }
 
+// Creates the window, renderer and loads some resources.
 void create_renderer_and_window(Game *game, int width, int height) {
 	game->window = NULL;
 	game->renderer = NULL;
@@ -49,6 +52,7 @@ void create_renderer_and_window(Game *game, int width, int height) {
 	game->startscreen_texture = NULL;
 	game->endscreen_texture = NULL;
 
+	// Tell SDL to intialize
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		sdl_error(game, "SDL_Init");
 	}
@@ -62,6 +66,7 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		img_error(game, "IMG_Init");
 	}
 
+	// Create a window.
 	game->window = SDL_CreateWindow("2048",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		width, height, 0);
@@ -70,6 +75,7 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		sdl_error(game, "CreateWindow");
 	}
 
+	// Create a renderer.
 	game->renderer = SDL_CreateRenderer(game->window,
 		-1, SDL_RENDERER_PRESENTVSYNC);
 
@@ -77,18 +83,22 @@ void create_renderer_and_window(Game *game, int width, int height) {
 		sdl_error(game, "CreateRenderer");
 	}
 
+	// Load the font used for the interface.
 	game->interface_font = TTF_OpenFont("./res/font.ttf", 60);
 	if (game->interface_font == NULL) {
 		ttf_error(game, "OpenFont");
 	}
 
+	// Load the start screen texture.
 	SDL_Surface *startscreen_surface = IMG_Load("./res/StartScreen.png");
 	if (startscreen_surface == NULL) {
 		img_error(game, "OpenImage");
 	}
 
 	game->startscreen_texture = SDL_CreateTextureFromSurface(game->renderer, startscreen_surface);
+	SDL_FreeSurface(startscreen_surface);
 
+	// Define positions and size of "Normal" and "Endless" buttons.
 	SDL_Rect *rect = malloc(sizeof(SDL_Rect));
 	rect->x = 80; rect->y = 130; rect->w = 470; rect->h = 130;
 	game->start_normal_rect = rect;
@@ -97,6 +107,7 @@ void create_renderer_and_window(Game *game, int width, int height) {
 	rect->x = 80; rect->y = 415; rect->w = 470; rect->h = 130;
 	game->start_endless_rect = rect;
 
+	// Load the end screen texture.
 	SDL_Surface *endscreen_surface = IMG_Load("./res/EndScreen.png");
 	if (endscreen_surface == NULL) {
 		img_error(game, "OpenImage");
@@ -104,10 +115,10 @@ void create_renderer_and_window(Game *game, int width, int height) {
 
 	game->endscreen_texture = SDL_CreateTextureFromSurface(game->renderer, endscreen_surface);
 
+	// Size and position "Play Again" button.
 	rect = malloc(sizeof(SDL_Rect));
 	rect->x = 80; rect->y = 290; rect->w = 470; rect->h = 130;
 	game->play_again_rect = rect;
-
 }
 
 TileTexture *create_tile_texture(Game *game,
@@ -234,6 +245,7 @@ void create_initial_tile_textures(Game *game) {
 }
 
 void free_rendering_stuff(Game *game) {
+	// Free textures for the tiles.
 	TileTexture *tex, *next;
 	tex = game->tile_textures;
 	while (tex != NULL) {
@@ -242,6 +254,8 @@ void free_rendering_stuff(Game *game) {
 		free(tex);
 		tex = next;
 	}
+
+	// Free other textures.
 
 	if (game->startscreen_texture != NULL) {
 		SDL_DestroyTexture(game->startscreen_texture);
@@ -254,6 +268,7 @@ void free_rendering_stuff(Game *game) {
 		free(game->play_again_rect);
 	}
 
+	// Close the font.
 	if (game->interface_font != NULL)
 		TTF_CloseFont(game->interface_font);
 
@@ -263,6 +278,7 @@ void free_rendering_stuff(Game *game) {
 		SDL_DestroyWindow(game->window);
 }
 
+// Displays a single square with the specified value at the specified point on the screen.
 void display_square(Game *game, const uint32_t val, const SDL_Rect *rect) {
 	TileTexture *tex = game->tile_textures;
 	for (;;) {
@@ -281,6 +297,7 @@ void display_square(Game *game, const uint32_t val, const SDL_Rect *rect) {
 
 const int UI_HEIGHT = 100;
 
+// Displays the whole playing field.
 void display_board(Game *game) {
 	int display_width = game->window_width;
 	int display_height = game->window_height - UI_HEIGHT;
@@ -302,6 +319,7 @@ void display_board(Game *game) {
 	}
 }
 
+// Displays the score text at the top.
 void display_interface(Game *game) {
 	char scoreText[40];
 	sprintf(scoreText, "Score: %d", game->score);

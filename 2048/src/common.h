@@ -30,6 +30,8 @@ typedef struct {
 	enum GameState state;
 	enum GameMode mode;
 
+	// -- Rendering-related stuff
+
 	SDL_Renderer *renderer;
 	SDL_Window *window;
 	TTF_Font *interface_font;
@@ -46,4 +48,5 @@ typedef struct {
 	int window_width, window_height;
 } Game;
 
+// Utility function to get the value at specified x and y coordinates.
 uint32_t get_value(const Game *game, int x, int y);
