@@ -209,8 +209,6 @@ void create_more_tile_textures(Game *game, TileTexture *last) {
 
 	uint32_t steps_total = current_step + 11; // 2 ^ 11 = 2048
 
-	SDL_Surface *current_surface;
-
 	while (current_step <= steps_total) {
 		uint32_t current_value = (uint32_t)pow(2, current_step);
 		if (current_step == 0) current_value = 0;

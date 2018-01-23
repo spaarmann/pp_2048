@@ -18,7 +18,7 @@
 // Finds a new position for the tile at 'x' after a move.
 // 'stop' is used to prevent a tile being merged twice in one move.
 uint32_t find_target(uint32_t *array, uint32_t x, uint32_t stop) {
-	uint32_t t;
+	int32_t t;
 	if (x == 0) {
 		// Don't move empty tiles
 		return x;
@@ -38,7 +38,7 @@ uint32_t find_target(uint32_t *array, uint32_t x, uint32_t stop) {
 			return t;
 		}
 		else {	
-			if (t == stop) {
+			if ((uint32_t) t == stop) {
 				// we should not slide further, return this one
 				return t;
 			}
@@ -203,9 +203,9 @@ bool has_valid_moves(Game *game) {
 		move_board(game);
 
 		// Iterate over the whole board.
-		for (int y = 0; y < game->size; y++) {
+		for (uint32_t y = 0; y < game->size; y++) {
 			uint32_t *row = game->board + y * game->size;
-			for (int x = 0; x < game->size; x++) {
+			for (uint32_t x = 0; x < game->size; x++) {
 				// Check if it could be moved.
 				if (find_target(row, x, 0) != x) {
 					any_moves_found = true;

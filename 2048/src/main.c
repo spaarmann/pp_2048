@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include <SDL.h>
 
 #include "common.h"
@@ -22,6 +25,9 @@ void init_board(Game *game) {
 }
 
 int main(int argc, char **argv) {
+	// Seed random number generator.
+	srand(time(NULL));
+
 	// Create our main game struct.
 	Game game;
 
