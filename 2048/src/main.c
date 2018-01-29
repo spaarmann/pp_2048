@@ -95,19 +95,19 @@ int main(int argc, char **argv) {
 					switch (e.key.keysym.sym) {
 					case SDLK_UP:
 						// Move Up
-						moved_anything = move_up(&game);
+						moved_anything = do_move_up(&game);
 						break;
 					case SDLK_DOWN:
 						// Move Down
-						moved_anything = move_down(&game);
+						moved_anything = do_move_down(&game);
 						break;
 					case SDLK_LEFT:
 						// Move Left
-						moved_anything = move_left(&game);
+						moved_anything = do_move_left(&game);
 						break;
 					case SDLK_RIGHT:
 						// Move Right
-						moved_anything = move_right(&game);
+						moved_anything = do_move_right(&game);
 						break;
 					}
 

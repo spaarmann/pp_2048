@@ -50,7 +50,7 @@ uint32_t find_target(uint32_t *array, uint32_t x, uint32_t stop) {
 
 // Executes a move for one column of the board.
 // Returns whether any field was moved.
-bool slide_array(Game *game, uint32_t *array) {
+bool move_column(Game *game, uint32_t *array) {
 	bool success = false;
 	uint32_t x, t, stop = 0;
 
@@ -77,7 +77,7 @@ bool slide_array(Game *game, uint32_t *array) {
 }
 
 // Rotates the board clockwise by 90°
-void move_board(Game *game) {
+void rotate_board(Game *game) {
 	uint32_t i, j, n = game->size;
 	uint32_t tmp;
 
@@ -96,13 +96,13 @@ void move_board(Game *game) {
 
 // Performs a move on the whole board.
 // Returns whether any field was moved.
-bool move_up(Game *game) {
+bool do_move_up(Game *game) {
 	bool success = false;
 	uint32_t x;
 
 	// Move each column of the board seperately
 	for (x = 0; x < game->size; x++) {
-		success |= slide_array(game, game->board + x * game->size);
+		success |= move_column(game, game->board + x * game->size);
 	}
 
 	return success;
@@ -112,33 +112,33 @@ bool move_up(Game *game) {
 // rotating the board, performing a move up and rotating some more.
 // They also return whether any tile was moved.
 
-bool move_left(Game *game) {
+bool do_move_left(Game *game) {
 	bool success;
-	move_board(game);
-	success = move_up(game);
-	move_board(game);
-	move_board(game);
-	move_board(game);
+	rotate_board(game);
+	success = do_move_up(game);
+	rotate_board(game);
+	rotate_board(game);
+	rotate_board(game);
 	return success;
 }
 
-bool move_down(Game *game) {
+bool do_move_down(Game *game) {
 	bool success;
-	move_board(game);
-	move_board(game);
-	success = move_up(game);
-	move_board(game);
-	move_board(game);
+	rotate_board(game);
+	rotate_board(game);
+	success = do_move_up(game);
+	rotate_board(game);
+	rotate_board(game);
 	return success;
 }
 
-bool move_right(Game *game) {
+bool do_move_right(Game *game) {
 	bool success;
-	move_board(game);
-	move_board(game);
-	move_board(game);
-	success = move_up(game);
-	move_board(game);
+	rotate_board(game);
+	rotate_board(game);
+	rotate_board(game);
+	success = do_move_up(game);
+	rotate_board(game);
 	return success;
 }
 
@@ -200,7 +200,7 @@ bool has_valid_moves(Game *game) {
 
 	// Check for each of the 4 possible move directions.
 	for (int dir = 0; dir < 4; dir++) {
-		move_board(game);
+		rotate_board(game);
 
 		// Iterate over the whole board.
 		for (uint32_t y = 0; y < game->size; y++) {
